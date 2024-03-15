@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import pandas.errors
 
 # Import libs
 try:
     import pandas as pd
+    import pandas.errors
     import matplotlib.pyplot as plt
     import seaborn as sns
     import numpy as np
@@ -13,17 +13,40 @@ try:
     from statsmodels.formula.api import ols
     from tqdm import tqdm
 except ImportError:
-    raise ImportError('La librería no se pudo inicializar porque falta una de las dependencias. Ejecuta "pip install -r requirements.txt" para solucionar el problema')
+    raise ImportError(
+        'La librería no se pudo inicializar porque falta una de las dependencias. Ejecuta "pip install -r requirements.txt" para solucionar el problema')
 
-class EDA():
 
-    def __init__(self, verbose: int=0, df: pd.DataFrame=None):
+class EDA:
+    """
+        A class used to wrap eda functions
+
+        Attributes
+        ----------
+        verbose : int
+            level of verbose desired (default is 0)
+        df : pd.DataFrame
+            dataframe to work with (default is None)
+    """
+
+    def __init__(self, verbose: int = 0, df: pd.DataFrame = None):
+        """
+            Parameters
+            ----------
+            verbose : int, optional
+                The level of verbose desired (default is 0)
+            df : pd.DataFrame, optional
+                An already loaded dataframe to start with (default is None)
+        """
         self.verbose = verbose
         self.df = df
 
     # Private methods
 
     def __print_df_stats(self) -> None:
+        """
+            Prints main statistics of the dataframe using pandas library and first five rows of the dataframe
+        """
         print("\nImprimiendo valores nulos del dataset\n")
         print("#####################################")
         self.df.info()
@@ -35,12 +58,33 @@ class EDA():
         print(self.df.head(5))
 
     def __get_dataframe_corr(self) -> pd.DataFrame:
+        """
+            Calculates the correlation matrix for the dataframe
+
+            Raises
+            ------
+            Exception
+                If dataframe is null, an exception is raised
+
+            Returns
+            -------
+            pd.DataFrame
+                a pd.DataFrame with the correlation matrix
+        """
         try:
             return self.df.corr()
         except:
             raise Exception
 
     def __create_vif_dataframe(self) -> pd.DataFrame:
+        """
+            Calculates the variance inflation factor per each one of the columns in the dataframe
+
+            Returns
+            ------
+            pd.DataFrame
+                a pd.DataFrame with the variance inflation factor calculated per each feature
+        """
         vif_data = pd.DataFrame()
         vif_data["feature"] = self.df.columns
         vif_data["VIF"] = [variance_inflation_factor(self.df.values, i) for i in range(len(self.df.columns))]
@@ -84,7 +128,7 @@ class EDA():
         missing_values_df = pd.DataFrame({
             'features': [key for key in results.keys()],
             'non-null values': [values for values in results.values()],
-            'non-null %': [((value/total_rows)*100) for value in results.values()]
+            'non-null %': [((value / total_rows) * 100) for value in results.values()]
         })
         print("\nTotal no. of rows: " + str(total_rows) + "\n")
         print(missing_values_df)
@@ -106,7 +150,7 @@ class EDA():
         except:
             raise Exception
 
-    def sns_histograms(self, hue: str="") -> None:
+    def sns_histograms(self, hue: str = "") -> None:
         try:
             f, ax = plt.subplots(figsize=(7, 5))
             sns.set_theme(style="ticks")
@@ -126,7 +170,7 @@ class EDA():
         cmap = sns.diverging_palette(230, 20, as_cmap=True)
         sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
-    def sns_pairplot(self, hue: str="") -> None:
+    def sns_pairplot(self, hue: str = "") -> None:
         print("Generando gráfico: esta acción puede tardar unos minutos. NO DETENER LA EJECUCION")
         sns.pairplot(self.df, hue=hue)
         plt.show()
@@ -134,9 +178,9 @@ class EDA():
     # Function to convert columns in dataset
 
     def convert_categorical_variable(self, column: str) -> None:
-        self.df[column] = self.df[column].map( {
+        self.df[column] = self.df[column].map({
             self.df[column].unique()[i]: i for i in list(range(len(self.df[column].unique())))
-        } )
+        })
 
     # Function to calculate VIF
 
