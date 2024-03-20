@@ -232,3 +232,24 @@ class EDA:
 
         # Print linear regression formula
         print("Fórmula final de regresión: ", " + ".join(final_formula))
+
+    def to_excel(self, filename: str = "my_eda_dataset") -> None:
+        """
+            Calculates the correlation matrix for the dataframe
+
+            Parameters
+            ----------
+            filename : str, optional
+                The file name to save the dataset modified
+
+            Raises
+            ------
+            Exception
+                If dataframe is null, an exception is raised
+        """
+        try:
+            filename += ".xlsx"
+            print("\nArchivo guardado en ./" + filename + "\n")
+            self.df.to_excel(filename, index=False)
+        except:
+            raise Exception
